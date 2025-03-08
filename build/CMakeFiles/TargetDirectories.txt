@@ -1,0 +1,3 @@
+/home/pandu/Image_Processing/build/CMakeFiles/pandu.dir
+/home/pandu/Image_Processing/build/CMakeFiles/edit_cache.dir
+/home/pandu/Image_Processing/build/CMakeFiles/rebuild_cache.dir

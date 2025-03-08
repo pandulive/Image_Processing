@@ -1,39 +1,49 @@
-// C++ program for the above approach 
-#include <iostream> 
-#include <opencv2/opencv.hpp> 
-using namespace cv; 
-using namespace std; 
-  
-// Driver code 
-int main(int argc, char** argv) 
-{ 
-    // Read the image file as 
-    // imread("default.jpg"); 
-    Mat image = imread("../image.jpeg", 
-                       IMREAD_COLOR); 
-  
-    // Error Handling 
-    if (image.empty()) { 
-        cout << "Image File "
-             << "Not Found" << endl; 
-  
-        // wait for any key press 
-        cin.get(); 
-        return -1; 
-    } 
-  
-    Size sz = image.size();
-    int imageWidth = sz.width;
-    int imageHeight = sz.height;
-    // Show Image inside a window with 
-    // the name provided 
-    cout << "Width " << imageWidth << " Height " << imageHeight <<endl;
-    Mat resized_down;
-    resize(image, resized_down, Size(450,800), INTER_LINEAR);
-    imshow("Window Name", image); 
-    imshow("Size reduced", resized_down); 
-  
-    // Wait for any keystroke 
-    waitKey(0); 
-    return 0; 
-} 
+#include <opencv2/opencv.hpp>
+#include <iostream>
+
+int main() {
+    cv::Mat image = imread("../image2.jpeg", cv::IMREAD_COLOR);
+    if (image.empty()) {
+        std::cerr << "Error: Could not load image!" << std::endl;
+        return -1;
+    }
+    cv::Mat img;
+    resize(image, img, cv::Size(400,250), cv::INTER_LINEAR);
+
+    // Convert to LAB color space (L = lightness, A/B = color)
+    cv::Mat lab;
+    cv::cvtColor(img, lab, cv::COLOR_BGR2Lab);
+
+    // Split LAB channels
+    std::vector<cv::Mat> lab_channels;
+    cv::split(lab, lab_channels);
+
+    // Process only the Luminance (L) channel
+    for (int y = 0; y < lab_channels[0].rows; y++) {
+        for (int x = 0; x < lab_channels[0].cols; x++) {
+            uchar& L = lab_channels[0].at<uchar>(y, x);
+            if (L > 200) { // If pixel is too bright
+                float reduction_factor = 0.75 + 0.25 * ((255 - L) / 55.0); // Dynamic adjustment
+                L = cv::saturate_cast<uchar>(L * reduction_factor); // Reduce intensity smoothly
+                
+            }
+        }
+        
+    }
+
+    // Merge LAB channels and convert back to BGR
+    cv::merge(lab_channels, lab);
+    cv::Mat result;
+    cv::cvtColor(lab, result, cv::COLOR_Lab2BGR);
+
+    // Show images
+    cv::imshow("Original Image", img);
+    cv::imshow("Flash Reduced Image", result);
+    
+    
+    cv::waitKey(0);
+
+    return 0;
+}
+
+
