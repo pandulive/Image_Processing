@@ -89,8 +89,8 @@ int main() {
     }
 
     // **Set Camera Resolution**
-    cap.set(cv::CAP_PROP_FRAME_WIDTH, 1280);
-    cap.set(cv::CAP_PROP_FRAME_HEIGHT, 720);
+    cap.set(cv::CAP_PROP_FRAME_WIDTH, 1920);
+    cap.set(cv::CAP_PROP_FRAME_HEIGHT, 1080);
 
     // **Read Initial Camera Settings**
     int brightness = getCameraSetting("brightness");
