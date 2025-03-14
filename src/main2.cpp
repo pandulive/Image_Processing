@@ -9,7 +9,7 @@ int main(int argc, char** argv)
 { 
     // Read the image file as 
     // imread("default.jpg"); 
-    Mat image = imread("../image1.jpeg", IMREAD_COLOR); 
+    Mat image = imread("../image2.jpeg", IMREAD_COLOR); 
     // Mat gray, blurred, edges;
     cv::Mat img, sharpened, denoised, enhanced, upscaled;
     resize(image, img, Size(400,250), INTER_LINEAR);
@@ -49,6 +49,8 @@ int main(int argc, char** argv)
 
     cv::Mat final_image;
     cv::merge(channels, final_image);
+
+    
 
     // Show results
     cv::imshow("Original Image", img);

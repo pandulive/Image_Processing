@@ -1,8 +1,0 @@
-[
-{
-  "directory": "/home/pandu/Image_Processing/build",
-  "command": "/usr/bin/g++  -isystem /usr/include/opencv4 -g -o CMakeFiles/pandu.dir/src/main.cpp.o -c /home/pandu/Image_Processing/src/main.cpp",
-  "file": "/home/pandu/Image_Processing/src/main.cpp",
-  "output": "CMakeFiles/pandu.dir/src/main.cpp.o"
-}
-]

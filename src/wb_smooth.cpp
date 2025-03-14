@@ -75,9 +75,9 @@ double estimateColorTemperature(const cv::Mat& image) {
     return std::round(std::min(std::max(temp, 1000.0), 10000.0));  // Clamp & round to nearest integer
 }
 
-// **Function to Smoothly Adjust White Balance Using Exponential Moving Average (EMA)**
-int smoothWhiteBalance(int currentWB, int targetWB, double alpha = 0.2) {
-    return static_cast<int>(alpha * targetWB + (1.0 - alpha) * currentWB);
+// **Function to Gradually Adjust White Balance**
+int smoothWhiteBalance(int currentWB, int targetWB, double step = 0.1) {
+    return static_cast<int>(currentWB + step * (targetWB - currentWB));
 }
 
 int main() {
@@ -114,16 +114,11 @@ int main() {
         // **Estimate Corrected Color Temperature (1000K - 10000K)**
         double colorTemperature = estimateColorTemperature(frame);
 
-        // **If AWB is OFF, Gradually Adjust White Balance**
+        // **If AWB is OFF, Smoothly Adjust White Balance Instead of Jumping**
         if (!autoWB) {
             int targetWB = static_cast<int>(colorTemperature);
             targetWB = std::min(std::max(targetWB, 1000), 10000);
-
-            // **Use EMA to smooth WB changes**
-            double adaptiveAlpha = 0.05 + (std::abs(targetWB - whiteBalance) / 5000.0); // Adjust speed dynamically
-            adaptiveAlpha = std::min(std::max(adaptiveAlpha, 0.05), 0.3); // Clamp alpha
-            whiteBalance = smoothWhiteBalance(whiteBalance, targetWB, adaptiveAlpha);
-
+            whiteBalance = smoothWhiteBalance(whiteBalance, targetWB, 0.05); // 5% smooth transition
             lastRecordedWB = whiteBalance;  // Store last WB used in AWB OFF mode
         }
 

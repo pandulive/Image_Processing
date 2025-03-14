@@ -75,11 +75,6 @@ double estimateColorTemperature(const cv::Mat& image) {
     return std::round(std::min(std::max(temp, 1000.0), 10000.0));  // Clamp & round to nearest integer
 }
 
-// **Function to Smoothly Adjust White Balance Using Exponential Moving Average (EMA)**
-int smoothWhiteBalance(int currentWB, int targetWB, double alpha = 0.2) {
-    return static_cast<int>(alpha * targetWB + (1.0 - alpha) * currentWB);
-}
-
 int main() {
     // **Open USB Camera**
     cv::VideoCapture cap(0);
@@ -97,7 +92,6 @@ int main() {
     int contrast = getCameraSetting("contrast");
     int saturation = getCameraSetting("saturation");
     int whiteBalance = getCameraSetting("white_balance_temperature");
-    int lastRecordedWB = whiteBalance; // Store last WB when AWB was OFF
 
     brightness = std::max(0, std::min(15, brightness));
     contrast = std::max(0, std::min(30, contrast));
@@ -114,17 +108,10 @@ int main() {
         // **Estimate Corrected Color Temperature (1000K - 10000K)**
         double colorTemperature = estimateColorTemperature(frame);
 
-        // **If AWB is OFF, Gradually Adjust White Balance**
+        // **If AWB is OFF, Use Current Estimated Temperature as Manual WB**
         if (!autoWB) {
-            int targetWB = static_cast<int>(colorTemperature);
-            targetWB = std::min(std::max(targetWB, 1000), 10000);
-
-            // **Use EMA to smooth WB changes**
-            double adaptiveAlpha = 0.05 + (std::abs(targetWB - whiteBalance) / 5000.0); // Adjust speed dynamically
-            adaptiveAlpha = std::min(std::max(adaptiveAlpha, 0.05), 0.3); // Clamp alpha
-            whiteBalance = smoothWhiteBalance(whiteBalance, targetWB, adaptiveAlpha);
-
-            lastRecordedWB = whiteBalance;  // Store last WB used in AWB OFF mode
+            whiteBalance = static_cast<int>(colorTemperature);
+            whiteBalance = std::min(std::max(whiteBalance, 1000), 10000);
         }
 
         // **Apply Settings to Camera**
@@ -151,7 +138,7 @@ int main() {
         if (key == 't') { 
             autoWB = !autoWB;
             if (autoWB) {
-                whiteBalance = lastRecordedWB;  // Use the last recorded WB when turning AWB ON
+                whiteBalance = 4500;  // Reset to 4500K when AWB is ON
             } else {
                 whiteBalance = static_cast<int>(colorTemperature);
                 whiteBalance = std::min(std::max(whiteBalance, 1000), 10000);

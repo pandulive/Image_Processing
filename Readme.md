@@ -6,3 +6,4 @@ SO, Installing them.
 2. Install Opencv
     sudo apt update && sudo apt install -y libopencv-dev python3-opencv
 
+MCP2221 
